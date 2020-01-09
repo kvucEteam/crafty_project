@@ -1,0 +1,64 @@
+<html><head></head><body><div id="game"></div><script type="text/javascript" src="crafty-min.js"></script><script>
+    Crafty.init(800, 350, document.getElementById('game'));
+
+    Crafty.background('green');
+
+    Crafty.sprite(16, 'tileset.png', {
+        sky: [4, 21]
+    })
+
+    var score = 0;
+
+    newStar();
+
+    var scoreText = Crafty.e("2D, DOM, Text").attr({ x: 10, y: 10 })
+        .text("Score: " + score).textColor("white").textFont({ size: '20px', weight: 'bold' });
+
+    let platform = Crafty.e("2D, Canvas, Color, platform")
+        .color("black")
+        .attr({
+            x: -800,
+            y: 300,
+            w: 1600,
+            h: 20
+        })
+
+
+    let player = Crafty.e("2D, Canvas, sky, Gravity, Twoway, Collision")
+        .attr({
+            x: 250,
+            y: 175,
+            w: 30,
+            h: 30
+        })
+        .gravity("platform")
+        .twoway(700, 500)
+        .checkHits('star').bind('HitOn', function(hitData) {
+
+            hitData[0].obj.destroy()
+            newStar();
+            score++;
+            scoreText.text("Score: " + score);
+        })
+
+    function newStar() {
+        let star = Crafty.e("2D, Canvas, Color, Collision, star")
+            .color('#' + Math.floor(Math.random() * 16777215).toString(16))
+            .attr({
+                x: -800 + Math.random() * 1600,
+                y: Math.random() * 175,
+                w: 20,
+                h: 20
+            })
+
+    }
+
+    Crafty.viewport.clampToEntities = true;
+
+    Crafty.viewport.scale(1);
+    Crafty.one("CameraAnimationDone", function() {
+        Crafty.viewport.follow(player, 0, 400);
+    });
+    Crafty.viewport.centerOn(player, 0);
+    Crafty.viewport.bounds = {min:{x:-800, y:150}, max:{x:800, y:150}};
+    </script></body></html>
